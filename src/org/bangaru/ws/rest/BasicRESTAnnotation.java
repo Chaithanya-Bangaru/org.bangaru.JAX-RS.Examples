@@ -1,14 +1,16 @@
 package org.bangaru.ws.rest;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
+import javax.sql.DataSource;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-import org.banaru.mysql.dao.JavaRestJNDI;
+import org.bangaru.mysql.dao.JavaRestJNDI;
 
 @Path(value = "/webservice")
 public class BasicRESTAnnotation {
@@ -32,12 +34,18 @@ public class BasicRESTAnnotation {
 	@Path(value = "/dbTime")
 	public String getDateTimeinMySqlDatabase(){
 		PreparedStatement pst = null;
+		Connection conn = null;
 		ResultSet rs = null;
 		String myString = null;
 		String dbReturnString = null;
+		DataSource ds = null;
 
 		try {
-			pst = JavaRestJNDI.getConnectionFromMySqlDS().getConnection().prepareStatement("SELECT curdate(),curtime() as DATETIME");
+			ds = JavaRestJNDI.getConnectionFromMySqlDS();
+			conn = ds.getConnection();
+			System.out.println("conn:"+conn);
+			String sql = "SELECT curdate(),curtime() as DATETIME";
+			pst = conn.prepareStatement(sql);
 			rs = pst.executeQuery();
 
 			while(rs.next()){
